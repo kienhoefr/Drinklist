@@ -1,6 +1,6 @@
 {
   "name": "drinklist",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Web app for order various drinks",
   "main": "src/server.js",
   "scripts": {
