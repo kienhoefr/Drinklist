@@ -8,18 +8,18 @@ import {UserService} from '../../services/user.service';
   template: `
     <div class="row">
       <div class="col">
-        <button class="btn btn-warning btn-sm w-100" (click)="addMoney.open()">
+        <button class="btn btn-warning btn-sm w-100" (click)="addMoney.open()" [disabled]="user.id === 0">
           <fa-icon [icon]="icons.money"></fa-icon>
           Add Money
         </button>
       </div>
-      <div class="col pl-0">
+      <div class="col ps-0">
         <button class="btn btn-warning btn-sm w-100" (click)="toggleVisibility()">
           <fa-icon [icon]="user.hidden ? icons.eye : icons.eyeSlash"></fa-icon>
           {{user.hidden ? 'Show' : 'Hide'}} User
         </button>
       </div>
-      <div class="col pl-0">
+      <div class="col ps-0">
         <button class="btn btn-warning btn-sm w-100" (click)="deleteConfirm.open()">
           <fa-icon [icon]="icons.trash"></fa-icon>
           Delete User
@@ -54,16 +54,16 @@ export class AdminUsersActionsComponent {
   }
 
   deleteUser = () => {
-    this.userService.deleteUser(this.user).subscribe(response => {
-      if (response.status === 200) {
+    this.userService.deleteUser(this.user).subscribe({
+      next: () => {
         this.refresh();
       }
     });
   };
 
   toggleVisibility(): void {
-    this.userService.toggleVisibility(this.user).subscribe(response => {
-      if (response.status === 200) {
+    this.userService.toggleVisibility(this.user).subscribe({
+      next: () => {
         this.refresh();
       }
     });

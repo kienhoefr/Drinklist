@@ -1,22 +1,23 @@
-import IController from '../interfaces/controller.interface';
+import {IController} from '../interfaces/controller.interface';
 import {NextFunction, Request, Response, Router} from 'express';
-import DbService from '../services/api/db.service';
-import AuthMiddleware from './middlewares/auth.middleware';
-import AuthService from '../services/api/auth.service';
-import AuthController from './controllers/auth.controller';
-import UserController from './controllers/user.controller';
-import UserService from './services/user.service';
-import OrdersController from './controllers/orders.controller';
-import OrdersService from './services/orders.service';
-import BeveragesController from './controllers/beverages.controller';
-import BeveragesService from './services/beverages.service';
+import {DbService} from '../services/api/db.service';
+import {AuthMiddleware} from './middlewares/auth.middleware';
+import {AuthService} from '../services/api/auth.service';
+import {AuthController} from './controllers/auth.controller';
+import {UserController} from './controllers/user.controller';
+import {UserService} from './services/user.service';
+import {BeveragesController} from './controllers/beverages.controller';
+import {BeveragesService} from './services/beverages.service';
 import {requireAdmin} from './api.util';
 import {exec} from 'child_process';
-import StatsController from './controllers/stats.controller';
-import StatsService from './services/stats.service';
-import SettingsController from './controllers/settings.controller';
+import {StatsController} from './controllers/stats.controller';
+import {StatsService} from './services/stats.service';
+import {SettingsController} from './controllers/settings.controller';
+import {dbPath} from '../main';
+import {TransactionsService} from './services/transactions.service';
+import {TransactionsController} from './controllers/transactions.controller';
 
-class ApiModule implements IController {
+export class ApiModule implements IController {
   path = '/api';
   router = Router();
 
@@ -38,7 +39,7 @@ class ApiModule implements IController {
   private initControllers(): void {
     // Create Module Services
     const userService = new UserService(this.dbService);
-    const ordersService = new OrdersService(this.dbService);
+    const txService = new TransactionsService(this.dbService);
     const beveragesService = new BeveragesService(this.dbService);
     const statsService = new StatsService(this.dbService);
 
@@ -46,7 +47,7 @@ class ApiModule implements IController {
       // API Controllers
       new AuthController(this.auth),
       new UserController(userService),
-      new OrdersController(ordersService),
+      new TransactionsController(txService),
       new BeveragesController(beveragesService),
       new StatsController(statsService),
       new SettingsController(),
@@ -67,7 +68,7 @@ class ApiModule implements IController {
     this.router.get('/backup', requireAdmin, (req: Request, res: Response, next: NextFunction) => {
       let result = '';
 
-      const dump = exec('sqlite3 data/history.db ".dump"', {maxBuffer: 1024 * 1024 * 5}, error => {
+      const dump = exec(`sqlite3 ${dbPath} ".dump"`, {maxBuffer: 1024 * 1024 * 5}, error => {
         if (!error) {
           return;
         }
@@ -84,5 +85,3 @@ class ApiModule implements IController {
     });
   }
 }
-
-export default ApiModule;

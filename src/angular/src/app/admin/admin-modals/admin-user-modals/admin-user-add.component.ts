@@ -8,14 +8,12 @@ import {UserService} from '../../../services/user.service';
     <ng-template #content let-modal>
       <div class="modal-header">
         <h4 class="modal-title">Add User</h4>
-        <button type="button" class="close" (click)="modal.dismiss()">
-          <span>&times;</span>
-        </button>
+        <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
       </div>
       <div class="modal-body">
         <form #form="ngForm">
-          <div class="form-group">
-            <label for="name">Name</label>
+          <div class="mb-3">
+            <label class="form-label" for="name">Name</label>
             <input type="text" class="form-control" ngbAutofocus [(ngModel)]="username" [required]="true" name="name">
           </div>
         </form>
@@ -55,8 +53,8 @@ export class AdminUserAddComponent {
 
   addUser(): void {
     this.busy = true;
-    this.userService.addUser(this.username).subscribe(response => {
-      if (response.status === 200) {
+    this.userService.addUser(this.username).subscribe({
+      next: () => {
         this.modal?.close();
         this.busy = false;
         this.refresh();

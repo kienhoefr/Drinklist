@@ -1,12 +1,12 @@
 // @ts-ignore -- Required feature enabled in tsconfig.express.json
 import express, {Application, NextFunction, Request, Response} from 'express';
-import IService from './services/service.interface';
+import {IService} from './services/service.interface';
 import * as http from 'http';
 import {AddressInfo} from 'net';
-import ServerConfig from './models/server-config';
-import IController from './interfaces/controller.interface';
+import {ServerConfig} from './models/server-config';
+import {IController} from './interfaces/controller.interface';
 
-class Server {
+export class Server {
 
   private readonly app: Application;
   private readonly port: number;
@@ -41,24 +41,16 @@ class Server {
   }
 
   // Handle server shutdown
-  shutdown(): () => Promise<void> {
-    return async (): Promise<void> => {
-      console.log('[INFO] Shutting down services...');
-      for (const service of this.services) {
-        await service.shutdown();
-      }
-      console.log('[INFO] Services have shutdown.');
-      console.log('[INFO] Closing HTTP Server...');
-      this.server?.close(err => {
-        if (err) {
-          console.error(`Error while closing HTTP Server.\n${err}`);
-        } else {
-          console.log('HTTP Server closed.');
-        }
-        console.log('Goodbye!');
-        process.exit(0);
-      });
-    };
+  async shutdown(): Promise<void> {
+    console.log('[INFO] Shutting down services...');
+    for (const service of this.services) {
+      await service.shutdown();
+    }
+    console.log('[INFO] Services have shutdown.');
+    console.log('[INFO] Closing HTTP Server...');
+    this.server?.close();
+    console.log('[INFO] HTTP Server closed.');
+    console.log('Goodbye!');
   }
 
   private registerMiddlewares(middlewares: any[]): void {
@@ -85,5 +77,3 @@ class Server {
     });
   }
 }
-
-export default Server;

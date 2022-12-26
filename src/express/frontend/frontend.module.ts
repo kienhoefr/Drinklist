@@ -1,11 +1,11 @@
-import IController from '../interfaces/controller.interface';
+import {IController} from '../interfaces/controller.interface';
 import * as express from 'express';
 import {Request, Response, Router} from 'express';
-import UserSettings from '../models/user-settings';
+import {UserSettings} from '../models/user-settings';
 import * as fs from 'fs';
 
 
-class FrontendModule implements IController {
+export class FrontendModule implements IController {
   path = '/';
   router = Router();
 
@@ -37,9 +37,16 @@ class FrontendModule implements IController {
       this.initData();
       delete process.env.settingsUpdated;
     }
+
+    if (process.env.hasOwnProperty('firstStart')) {
+      // Allow CORS for this request only (needed for first start page)
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+
     if (!this.settings) {
       res.setHeader('Retry-After', '5');
-      return res.status(503).end();
+      res.status(503).end();
+      return;
     }
     res.status(200).json(this.settings);
   };
@@ -59,5 +66,3 @@ class FrontendModule implements IController {
     res.status(200).sendFile(`${this.rootDir}/dist/angular/index.html`);
   };
 }
-
-export default FrontendModule;

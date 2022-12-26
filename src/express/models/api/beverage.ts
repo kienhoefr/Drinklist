@@ -1,7 +1,7 @@
-interface Beverage {
+export interface Beverage {
+  id: number;
   name: string;
   stock: number;
   price: number;
+  deleted: boolean;
 }
-
-export default Beverage;

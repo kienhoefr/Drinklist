@@ -6,10 +6,10 @@ import {BeverageService} from '../services/beverage.service';
 import {Beverage} from '../models/beverage';
 import {LocaleService} from '../services/locale.service';
 import {Util} from '../util';
-import {OrderService} from '../services/order.service';
-import {Order} from '../models/order';
-import {faTrash} from '@fortawesome/free-solid-svg-icons/faTrash';
+import {faTrash} from '@fortawesome/free-solid-svg-icons';
 import {AppConfig} from '../app.config';
+import {TransactionsService} from '../services/transactions.service';
+import {BeverageTransaction} from '../models/beverage-transaction';
 
 @Component({
   selector: 'app-user-detail-page',
@@ -22,13 +22,17 @@ import {AppConfig} from '../app.config';
     .btn-beverage:hover {
       background-color: #dfdfdf;
     }
+
+    .vertical-align-middle td {
+      vertical-align: middle;
+    }
   `]
 })
 export class UserDetailPageComponent implements OnInit {
 
   user: User | null = null;
   beverages: Beverage[] = [];
-  orders: Order[] = [];
+  transactions: BeverageTransaction[] = [];
 
   get showStock(): boolean {
     return AppConfig.config.stock;
@@ -45,34 +49,38 @@ export class UserDetailPageComponent implements OnInit {
     public locale: LocaleService,
     private userService: UserService,
     private beverageService: BeverageService,
-    private orderService: OrderService,
+    private txnService: TransactionsService,
   ) {
   }
 
-  private loadData(username: string): void {
-    this.userService.getUser(username).subscribe(response => {
-      if (response.status === 200) {
-        this.user = response.data;
+  private loadData(userId: number): void {
+    if (userId < 0) {
+      return;
+    }
+
+    this.userService.getUser(userId).subscribe({
+      next: user => {
+        this.user = user;
       }
     });
 
-    this.beverageService.getBeverages().subscribe(response => {
-      if (response.status === 200 && response.data) {
-        this.beverages = response.data;
+    this.beverageService.getBeverages().subscribe({
+      next: beverages => {
+        this.beverages = beverages;
       }
     });
 
-    this.orderService.getUserOrders(username).subscribe(response => {
-      if (response.status === 200 && response.data) {
-        this.orders = response.data;
+    this.txnService.getBeverageTxnsByUser(userId).subscribe({
+      next: txns => {
+        this.transactions = txns;
       }
     });
   }
 
   ngOnInit(): void {
-    const username = this.route.snapshot.paramMap.get('username') || '';
+    const userId = +(this.route.snapshot.paramMap.get('id') || -1);
 
-    this.loadData(username);
+    this.loadData(userId);
   }
 
   getSafeUserBalance(): number {
@@ -84,25 +92,25 @@ export class UserDetailPageComponent implements OnInit {
       return;
     }
 
-    this.orderService.createOrder(this.user, beverage).subscribe(response => {
-      if (response.status === 200) {
+    this.txnService.orderBeverage(this.user, beverage).subscribe({
+      next: () => {
         // Give the DB some time to process the order.
         setTimeout(() => {
-          this.loadData(this.user?.name || '');
+          this.loadData(this.user?.id || -1);
         }, 100);
       }
     });
   }
 
-  deleteFreshOrder(order: Order): void {
-    if (!order.isFresh()) {
+  deleteFreshOrder(txn: BeverageTransaction): void {
+    if (!txn.isFresh()) {
       return;
     }
-    this.orderService.deleteRecentOrder(order).subscribe(response => {
-      if (response.status === 200) {
+    this.txnService.deleteBeverageTxn(txn).subscribe({
+      next: () => {
         // Give the DB some time to process the deletion.
         setTimeout(() => {
-          this.loadData(this.user?.name || '');
+          this.loadData(this.user?.id || -1);
         }, 100);
       }
     });

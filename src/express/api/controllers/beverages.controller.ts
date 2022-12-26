@@ -1,10 +1,10 @@
-import BeveragesService from '../services/beverages.service';
-import IController from '../../interfaces/controller.interface';
+import {BeveragesService} from '../services/beverages.service';
+import {IController} from '../../interfaces/controller.interface';
 import {Request, Response, Router} from 'express';
-import {requireAdmin, requireUser} from '../api.util';
-import Beverage from '../../models/api/beverage';
+import {asyncHandler, requireAdmin, requireUser} from '../api.util';
+import {Beverage} from '../../models/api/beverage';
 
-class BeveragesController implements IController {
+export class BeveragesController implements IController {
   path = '/beverages';
   router = Router();
 
@@ -15,55 +15,71 @@ class BeveragesController implements IController {
   }
 
   private initRoutes(): void {
-    this.router.get('/', requireUser, this.getBeverages);
-    this.router.post('/', requireAdmin, this.addBeverage);
-    this.router.patch('/:beverage', requireAdmin, this.updateBeverage);
-    this.router.delete('/:beverage', requireAdmin, this.deleteBeverage);
+    this.router.get('/', requireUser, asyncHandler(this.getBeverages));
+    this.router.post('/', requireAdmin, asyncHandler(this.addBeverage));
+    this.router.get('/:id', requireUser, asyncHandler(this.getBeverageById));
+    this.router.patch('/:beverage', requireAdmin, asyncHandler(this.updateBeverage));
+    this.router.delete('/:beverage', requireAdmin, asyncHandler(this.deleteBeverage));
   }
 
-  private getBeverages = (req: Request, res: Response) => {
-    const beverages = this.beveragesService.getBeverages();
+  private getBeverages = async (req: Request, res: Response) => {
+    const beverages = await this.beveragesService.getBeverages();
     res.status(200).json(beverages);
   };
 
-  private addBeverage = (req: Request, res: Response) => {
+  private getBeverageById = async (req: Request, res: Response) => {
+    const id = +req.params.id;
+
+    if (isNaN(id)) {
+      res.status(400).end();
+      return;
+    }
+
+    const beverage = await this.beveragesService.getBeverageById(id);
+    if (!beverage) {
+      res.status(404).end();
+      return;
+    }
+
+    res.status(200).json(beverage);
+  };
+
+  private addBeverage = async (req: Request, res: Response) => {
     const beverage = req.body as Beverage;
 
-    if (!beverage || !beverage.name || isNaN(beverage.price)) {
+    if (!beverage || !beverage.name || isNaN(+beverage.price)) {
       res.status(400).end();
       return;
     }
 
-    this.beveragesService.addBeverage(beverage);
+    await this.beveragesService.addBeverage(beverage);
     res.status(200).end();
   };
 
-  private updateBeverage = (req: Request, res: Response) => {
-    const beverage = req.params.beverage;
-    const price = req.body.price as number;
-    const stockToAdd = req.body.stockToAdd as number;
+  private updateBeverage = async (req: Request, res: Response) => {
+    const beverage = +req.params.beverage;
+    const price = +req.body.price;
+    const stockToAdd = +req.body.stockToAdd;
 
-    // Invalid request if beverage is falsy or price AND stock are undefined
-    if (!beverage || price === undefined && stockToAdd === undefined) {
+    // Invalid request if beverage is NaN or price AND stock are NaN
+    if (isNaN(beverage) || isNaN(price) && isNaN(stockToAdd)) {
       res.status(400).end();
       return;
     }
 
-    this.beveragesService.updateBeverage(beverage, price, stockToAdd);
+    await this.beveragesService.updateBeverage(beverage, price, stockToAdd);
     res.status(200).end();
   };
 
-  private deleteBeverage = (req: Request, res: Response) => {
-    const beverage = req.params.beverage;
+  private deleteBeverage = async (req: Request, res: Response) => {
+    const beverage = +req.params.beverage;
 
-    if (!beverage) { // true if beverage is undefined or empty string
+    if (isNaN(beverage)) {
       res.status(400).end();
       return;
     }
 
-    this.beveragesService.deleteBeverage(beverage);
+    await this.beveragesService.deleteBeverage(beverage);
     res.status(200).end();
   };
 }
-
-export default BeveragesController;

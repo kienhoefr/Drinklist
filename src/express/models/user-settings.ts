@@ -1,5 +1,6 @@
-class UserSettings {
+export class UserSettings {
   constructor(
+    public version: number,
     public imprint: boolean,
     public dataProtection: boolean,
     public recentlyPurchased: boolean,
@@ -9,9 +10,14 @@ class UserSettings {
   ) {
   }
 
+  /**
+   * Check if an object is a valid user settings object
+   * @param obj the object to check
+   */
   static isValid(obj: any): boolean {
     // List of all properties
     const props = [
+      'version',
       'imprint',
       'dataProtection',
       'recentlyPurchased',
@@ -28,5 +34,3 @@ class UserSettings {
     return true;
   }
 }
-
-export default UserSettings;

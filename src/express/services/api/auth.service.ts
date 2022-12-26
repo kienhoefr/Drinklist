@@ -1,41 +1,68 @@
-import Session from '../../models/api/session';
+import {Session} from '../../models/api/session';
 import * as fs from 'fs';
-import IService from '../service.interface';
+import {IService} from '../service.interface';
+import {authPath} from '../../main';
+import * as crypto from 'crypto';
+import * as jwt from 'jsonwebtoken';
 
-class AuthService implements IService {
+interface AuthConfig {
+  kiosk: string;
+  admin: string;
+}
+
+export class AuthService implements IService {
 
   private auth: Map<string, boolean> = new Map<string, boolean>();
   private sessions: Map<string, Session> = new Map<string, Session>();
 
+  private secret!: Buffer; // Assert to not-null because error in generator would throw
+
   constructor() {
+    crypto.generateKey('hmac', {length: 256}, (err, key) => {
+      if (err) {
+        console.error('Could not generate secret for token signing!', err);
+        throw err;
+      }
+      this.secret = key.export();
+    });
+
     this.initAuth();
   }
 
   private initAuth(): void {
-    const root = fs.realpathSync('./');
-    const passwords = JSON.parse(fs.readFileSync(`${root}/data/auth.json`, 'utf-8')) as { password: string, root: boolean }[];
-    for (const password of passwords) {
-      this.auth.set(password.password, password.root);
-    }
+    const config = JSON.parse(fs.readFileSync(authPath, 'utf-8')) as AuthConfig;
+
+    this.auth.set(config.kiosk, false);
+    this.auth.set(config.admin, true);
   }
 
   shutdown(): Promise<void> {
-    // Nothing to shutdown
+    // Nothing to shut down
     return Promise.resolve();
   }
+
+  private readonly createPayload = () => ({
+    roles: [
+      'user',
+    ]
+  });
 
   login(password: string, session: Session): boolean {
     if (!this.auth.has(password)) { // Password unknown/wrong
       console.log('[FAIL] [login] login attempt with wrong password');
       return false;
     }
-    if (this.auth.get(password) === true) { // Password is admin
-      session.root = true;
+    const payload = this.createPayload();
+    if (this.auth.get(password) === true) { // Password has admin privileges
+      payload.roles.push('admin');
     }
+
+    session.token = jwt.sign(payload, this.secret, {jwtid: crypto.randomUUID()});
+
     this.sessions.set(session.token, session);
 
     // Login successful
-    console.log(`[API] [ OK ] [login] login with token ${session.token}`);
+    console.log(`[API] [ OK ] [login] login with roles ${payload.roles.toString()}`);
     return true;
   }
 
@@ -44,17 +71,50 @@ class AuthService implements IService {
   }
 
   isValid(token: string): boolean {
-    return this.sessions.has(token);
+    try {
+      jwt.verify(token, this.secret);
+      return this.sessions.has(token);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  isRole(token: string, role: string): boolean {
+    const payload = jwt.decode(token) as { roles: string[] };
+    return payload.roles.includes(role);
   }
 
   isAdmin(token: string): boolean {
-    return this.isValid(token) && (this.sessions.get(token)?.root || false);
+    return this.isValid(token) && this.isRole(token, 'admin');
   }
 
   getSessions(): Session[] {
-    return Array.from(this.sessions.values());
+    return Array.from(this.sessions.values())
+      .map(session => {
+        const clone = session.clone();
+        if (clone.token) {
+          const sanitizedToken = clone.token.split('.').slice(0, 2);
+          clone.token = sanitizedToken.join('.');
+        }
+        return clone;
+      });
   }
 
-}
+  revoke(token: string): void {
+    const base64 = Buffer.from(token.split('.')[1], 'base64');
+    const payload = JSON.parse(base64.toString());
+    if (!payload) {
+      return;
+    }
+    const jti = payload.jti;
 
-export default AuthService;
+    for (const session of this.sessions.values()) {
+      if (session.id !== jti) {
+        continue;
+      }
+      console.log(`[API] revoking token with ID ${session.id}`);
+      this.sessions.delete(session.token!);
+      break;
+    }
+  }
+}

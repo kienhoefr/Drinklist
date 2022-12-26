@@ -3,46 +3,70 @@
  * --------------------------------
  * Author: Raphael Kienhöfer
  */
-import Server from './server';
-import * as fs from 'fs';
-import AppSettings from './models/app-settings';
+import {Server} from './server';
+import {promises as fs} from 'fs';
+import {AppConfig} from './models/app-config';
 import * as bodyParser from 'body-parser';
-import DbService from './services/api/db.service';
-import ApiModule from './api/api.module';
-import AuthService from './services/api/auth.service';
-import FrontendModule from './frontend/frontend.module';
+import {DbService} from './services/api/db.service';
+import {ApiModule} from './api/api.module';
+import {AuthService} from './services/api/auth.service';
+import {FrontendModule} from './frontend/frontend.module';
+import * as path from 'path';
+import {migrate} from './migrations';
+import {runSetupWebsite} from './setup';
 
-const rootDir = fs.realpathSync('./');
+const cwd = process.cwd();
 
-// Check config files
-require(`${rootDir}/src/dataHelper`).checkAndCreateFiles();
-require(`${rootDir}/src/dataHelper`).migrateSettings();
+export const configPath = path.join(cwd, 'data', 'config.json');
+export const userSettingsPath = path.join(cwd, 'data', 'user-settings.json');
+export const authPath = path.join(cwd, 'data', 'auth.json');
+export const dbPath = path.join(cwd, 'data', 'drinklist.sqlite');
 
-// Read config values
-const settings: AppSettings = JSON.parse(fs.readFileSync(`${rootDir}/data/settings.json`, 'utf8'));
+async function main(): Promise<void> {
+  // Check and migrate config files
+  await migrate();
 
-// Initialize services
-const dbService = new DbService(`${rootDir}/data/history.db`);
-const auth = new AuthService();
+  if (process.env.hasOwnProperty('firstStart')) {
+    // Start setup website
+    await runSetupWebsite();
+    console.log('Setup website is done!');
+  }
 
-// Initialize server
-const server = new Server({
-  port: settings.port,
-  fullHost: settings.host,
-  middlewares: [
-    bodyParser.json(),
-  ],
-  modules: [
-    new ApiModule(dbService, auth),
-    new FrontendModule(),
-  ],
-  services: [
-    dbService,
-    auth,
-  ],
+  // Read config values
+  const config: AppConfig = await fs.readFile(configPath, 'utf8').then(JSON.parse);
+
+  // Initialize services
+  const dbService = await DbService.create(dbPath);
+  const auth = new AuthService();
+
+  // Initialize server
+  const server = new Server({
+    port: config.port,
+    middlewares: [
+      bodyParser.json(),
+    ],
+    modules: [
+      new ApiModule(dbService, auth),
+      new FrontendModule(),
+    ],
+    services: [
+      dbService,
+      auth,
+    ],
+  });
+
+  server.listen();
+
+  function shutdown(signal: string) {
+    console.log(`${signal} signal received.`);
+    server.shutdown().then(() => process.exit(0));
+  }
+
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
+}
+
+main().catch(e => {
+  console.error(`Critical Error occured: ${e.message}`);
+  process.exit(1);
 });
-
-server.listen();
-
-process.on('SIGINT', server.shutdown());
-process.on('SIGTERM', server.shutdown());

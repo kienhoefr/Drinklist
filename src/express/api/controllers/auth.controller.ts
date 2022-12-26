@@ -1,10 +1,10 @@
-import IController from '../../interfaces/controller.interface';
+import {IController} from '../../interfaces/controller.interface';
 import {Request, Response, Router} from 'express';
-import AuthService from '../../services/api/auth.service';
+import {AuthService} from '../../services/api/auth.service';
 import {requireAdmin} from '../api.util';
-import Session from '../../models/api/session';
+import {Session} from '../../models/api/session';
 
-class AuthController implements IController {
+export class AuthController implements IController {
   path = '/auth';
   router = Router();
 
@@ -18,6 +18,7 @@ class AuthController implements IController {
     this.router.get('/tokens', requireAdmin, this.tokens);
     this.router.post('/login', this.login);
     this.router.post('/logout', this.logout);
+    this.router.post('/revoke', requireAdmin, this.revoke);
   }
 
   tokens = (req: Request, res: Response) => {
@@ -37,10 +38,10 @@ class AuthController implements IController {
       req.ip
     );
     if (this.auth.login(password, session)) {
-      res.status(200).json(session);
+      res.status(200).send(session.token);
       return;
     }
-    res.status(403).end();
+    res.status(401).end();
   };
 
   logout = (req: Request, res: Response) => {
@@ -54,6 +55,16 @@ class AuthController implements IController {
     this.auth.logout(token);
     res.status(200).end();
   };
-}
 
-export default AuthController;
+  revoke = (req: Request, res: Response) => {
+    const token = '' + req.body.token;
+
+    if (token === undefined || token === '') {
+      res.status(400).end();
+      return;
+    }
+
+    this.auth.revoke(token);
+    res.status(200).end();
+  }
+}
