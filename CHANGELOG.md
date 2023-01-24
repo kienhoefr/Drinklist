@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.2](https://github.com/kienhoefr/Drinklist/compare/v2.0.1...v2.0.2) (2023-01-24)
+
+
+### Bug Fixes
+
+* **express:** fix jwt.decode() is not a function ([7696994](https://github.com/kienhoefr/Drinklist/commit/76969946a00e8ad412bda1bb2c77338bb7c7d0f2))
+
 ### [2.0.1](https://github.com/kienhoefr/Drinklist/compare/v2.0.0...v2.0.1) (2023-01-24)
 
 ## [2.0.0](https://github.com/kienhoefr/Drinklist/compare/1.4.0...v2.0.0) (2022-12-26)
