@@ -80,7 +80,7 @@ export class AuthService implements IService {
   }
 
   isRole(token: string, role: string): boolean {
-    const payload = jwt.decode(token) as { roles: string[] };
+    const payload = jwt.verify(token, this.secret) as { roles: string[] };
     return payload.roles.includes(role);
   }
 
