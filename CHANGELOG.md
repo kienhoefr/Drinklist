@@ -1,3 +1,9 @@
+# Changelog
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [2.0.1](https://github.com/kienhoefr/Drinklist/compare/v2.0.0...v2.0.1) (2023-01-24)
+
 ## [2.0.0](https://github.com/kienhoefr/Drinklist/compare/1.4.0...v2.0.0) (2022-12-26)
 
 
@@ -140,4 +146,3 @@
 * **setup:** remove adminPath from settings ([86df6dd](https://github.com/kienhoefr/Drinklist/commit/86df6dda7114e0a5785a9c9c64a58d342f726a8f))
 
 ## 1.0.0 (2019-11-27)
-
