@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.3](https://github.com/kienhoefr/Drinklist/compare/v2.0.2...v2.0.3) (2023-01-25)
+
+
+### Bug Fixes
+
+* **angular:** correctly implement api endpoints ([6f6f72b](https://github.com/kienhoefr/Drinklist/commit/6f6f72b97069a14c2cff3ecf27d369a613f2757d))
+
 ### [2.0.2](https://github.com/kienhoefr/Drinklist/compare/v2.0.1...v2.0.2) (2023-01-24)
 
 
