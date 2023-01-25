@@ -38,13 +38,13 @@ export class UserService {
   }
 
   deleteUser(user: User): Observable<void> {
-    return this.http.delete(`${this.usersUrl}/${user.name}`).pipe(
+    return this.http.delete(`${this.usersUrl}/${user.id}`).pipe(
       map(noop), // return void
     );
   }
 
   toggleVisibility(user: User): Observable<void> {
-    return this.http.post(`${this.usersUrl}/${user.name}/${user.hidden ? 'show' : 'hide'}`, '').pipe(
+    return this.http.post(`${this.usersUrl}/${user.id}/${user.hidden ? 'show' : 'hide'}`, '').pipe(
       map(noop), // return void
     );
   }
