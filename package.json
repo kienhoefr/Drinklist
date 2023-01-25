@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/express/main.js",
+    "dev:angular": "ng serve",
+    "dev:express": "npm run build:express && npm run start",
     "build": "npm run build:express && npm run build:angular && npm run build:static-files",
     "build:angular": "ng b -c production",
     "build:express": "tsc -p tsconfig.express.json",
