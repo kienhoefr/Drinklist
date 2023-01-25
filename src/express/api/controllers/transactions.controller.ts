@@ -98,6 +98,7 @@ export class TransactionsController extends BaseController {
     } else {
       await this.txnService.revertCashTransaction(id);
     }
+    res.status(200).end();
   }
 
   // Beverage TXNs
