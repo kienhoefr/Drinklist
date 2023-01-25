@@ -32,7 +32,7 @@ export class UserService {
   }
 
   addUser(name: string): Observable<void> {
-    return this.http.post(`${this.usersUrl}/${name}`, '').pipe(
+    return this.http.post(`${this.usersUrl}/`, {name}).pipe(
       map(noop), // return void
     );
   }

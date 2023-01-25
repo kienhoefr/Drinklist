@@ -33,19 +33,19 @@ export class BeverageService {
   }
 
   addStock(beverage: Beverage, stockToAdd: number): Observable<void> {
-    return this.http.patch(`${this.beveragesUrl}/${beverage.name}`, {stockToAdd}).pipe(
+    return this.http.patch(`${this.beveragesUrl}/${beverage.id}`, {stockToAdd}).pipe(
       map(noop)
     );
   }
 
   updatePrice(beverage: Beverage, price: number): Observable<void> {
-    return this.http.patch(`${this.beveragesUrl}/${beverage.name}`, {price}).pipe(
+    return this.http.patch(`${this.beveragesUrl}/${beverage.id}`, {price}).pipe(
       map(noop)
     );
   }
 
   deleteBeverage(beverage: Beverage): Observable<void> {
-    return this.http.delete(`${this.beveragesUrl}/${beverage.name}`).pipe(
+    return this.http.delete(`${this.beveragesUrl}/${beverage.id}`).pipe(
       map(noop)
     );
   }
