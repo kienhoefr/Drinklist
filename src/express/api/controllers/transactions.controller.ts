@@ -27,7 +27,7 @@ export class TransactionsController extends BaseController {
   // Generic methods
 
   private async getTransactions(req: Request, res: Response): Promise<void> {
-    const txnType = req.path.substr(req.path.lastIndexOf('/') + 1);
+    const txnType = req.path.substring(req.path.lastIndexOf('/') + 1);
     if (txnType !== 'cash' && txnType !== 'beverages') {
       throw new Error(`Invalid path ${req.path} (${txnType}) for getTranscations()`);
     }
