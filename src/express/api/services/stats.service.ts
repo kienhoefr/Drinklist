@@ -8,11 +8,22 @@ export class StatsService {
   ) {
   }
 
-  async getTransactionCount(): Promise<number> {
-    const sql = await this.dbService.prepare('SELECT COUNT(*) AS count FROM cash_transactions;');
-    return sql.get<{ count: number }>()
-      .then(result => result ? result.count : -1)
-      .finally(() => sql.reset());
+  async getTransactionCount(kind: string): Promise<number> {
+    const cashSql = await this.dbService.prepare('SELECT COUNT(*) AS count FROM cash_transactions;');
+    const beverageSql = await this.dbService.prepare('SELECT COUNT(*) AS count FROM beverage_transactions;');
+    let count = 0;
+    try {
+      if (kind === 'cash' || kind === 'both') {
+        count += (await cashSql.get<{ count: number }>())?.count ?? 0;
+      }
+      if (kind === 'beverage' || kind === 'both') {
+        count += (await beverageSql.get<{ count: number }>())?.count ?? 0;
+      }
+    } finally {
+      await cashSql.reset();
+      await beverageSql.reset();
+    }
+    return count;
   }
 
   async getUserCount(): Promise<number> {
