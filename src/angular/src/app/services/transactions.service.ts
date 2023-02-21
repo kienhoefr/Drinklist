@@ -88,7 +88,15 @@ export class TransactionsService {
 
   // Admin dashboard statistics
 
-  getTransactionCount(): Observable<number> {
-    return this.http.get<number>(`${this.api}/stats/transactions`);
+  getCashTransactionCount(): Observable<number> {
+    return this.http.get<number>(`${this.api}/stats/transactions`, {
+      params: {kind: 'cash'}
+    });
+  }
+
+  getBeverageTransactionCount(): Observable<number> {
+    return this.http.get<number>(`${this.api}/stats/transactions`, {
+      params: {kind: 'beverage'}
+    });
   }
 }

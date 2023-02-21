@@ -23,7 +23,14 @@ export class StatsController implements IController {
   }
 
   private getTransactionCount = async (req: Request, res: Response) => {
-    const orderCount = await this.statsService.getTransactionCount();
+    let kind = req.query.kind;
+    if (kind === undefined) {
+      kind = 'cash';
+    } else if (!(kind === 'cash' || kind === 'beverage' || kind === 'both')) {
+      res.status(400).send('Invalid parameter: kind');
+      return;
+    }
+    const orderCount = await this.statsService.getTransactionCount(kind);
     res.status(200).json(orderCount);
   };
 

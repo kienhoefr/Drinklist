@@ -67,7 +67,7 @@ export class AdminDashboardComponent implements OnInit {
       }
     });
 
-    this.txnService.getTransactionCount().subscribe({
+    this.txnService.getCashTransactionCount().subscribe({
       next: count => {
         this.orderCount = count;
       }
