@@ -27,14 +27,14 @@ export class StatsService {
   }
 
   async getUserCount(): Promise<number> {
-    const sql = await this.dbService.prepare('SELECT COUNT(*) AS count FROM Users;');
+    const sql = await this.dbService.prepare('SELECT COUNT(*) AS count FROM users WHERE deleted = 0;');
     return sql.get<{ count: number }>()
       .then(result => result ? result.count : -1)
       .finally(() => sql.reset());
   }
 
   async getBeverageCount(): Promise<number> {
-    const sql = await this.dbService.prepare('SELECT COUNT(*) AS count FROM Beverages;');
+    const sql = await this.dbService.prepare('SELECT COUNT(*) AS count FROM beverages WHERE deleted = 0;');
     return sql.get<{ count: number }>()
       .then(result => result ? result.count : -1)
       .finally(() => sql.reset());
@@ -46,12 +46,12 @@ export class StatsService {
   }
 
   async getTopSavers(): Promise<User[]> {
-    const sql = await this.dbService.prepare('SELECT * FROM users ORDER BY balance DESC LIMIT 5;');
+    const sql = await this.dbService.prepare('SELECT * FROM users WHERE id > 0 AND deleted = 0 ORDER BY balance DESC LIMIT 5;');
     return sql.all();
   }
 
   async getTopDebtors(): Promise<User[]> {
-    const sql = await this.dbService.prepare('SELECT * FROM users ORDER BY balance ASC LIMIT 5;');
+    const sql = await this.dbService.prepare('SELECT * FROM users WHERE id > 0 AND deleted = 0 ORDER BY balance ASC LIMIT 5;');
     return sql.all();
   }
 }
