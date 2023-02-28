@@ -12,7 +12,8 @@
     "build:angular": "ng b -c production",
     "build:express": "tsc -p tsconfig.express.json",
     "build:static-files": "copyfiles -u 2 src/first-start-page/**/* dist/first-start-page",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -86,6 +87,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.0.0",
     "nodemon": "^2.0.7",
+    "standard-version": "^9.5.0",
     "typescript": "~4.9.4"
   }
 }
