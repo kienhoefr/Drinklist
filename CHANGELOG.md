@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.1](https://github.com/kienhoefr/Drinklist/compare/v2.1.0...v2.1.1) (2023-02-28)
+
+
+### Bug Fixes
+
+* **express:** exclude deleted entities and system users from stats ([ee0449a](https://github.com/kienhoefr/Drinklist/commit/ee0449a25387593d807c4a72d981ff603f27e862))
+* **express:** limit top beverage stat to five entries ([b2b87ec](https://github.com/kienhoefr/Drinklist/commit/b2b87ec0296bfd776d68eadd6ec2fef040b0779b))
+
 ## [2.1.0](https://github.com/kienhoefr/Drinklist/compare/v2.0.3...v2.1.0) (2023-02-28)
 
 
