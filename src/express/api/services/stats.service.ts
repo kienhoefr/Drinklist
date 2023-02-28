@@ -41,7 +41,7 @@ export class StatsService {
   }
 
   async getTopBeverages(): Promise<(Beverage & { count: number })[]> {
-    const sql = await this.dbService.prepare('SELECT * FROM topBeverages');
+    const sql = await this.dbService.prepare('SELECT * FROM topBeverages LIMIT 5;');
     return sql.all();
   }
 
