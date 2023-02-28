@@ -11,6 +11,7 @@ import {BeverageService} from './beverage.service';
 import {CashTransaction} from '../models/cash-transaction';
 import {User} from '../models/user';
 import {Beverage} from '../models/beverage';
+import {PaginationOptions} from '../models/pagination-options';
 
 @Injectable({
   providedIn: 'root'
@@ -26,8 +27,12 @@ export class TransactionsService {
   ) {
   }
 
-  getCashTxns(): Observable<CashTransaction[]> {
-    return this.http.get<ICashTransaction[]>(`${this.txnUrl}/cash`).pipe(
+  getCashTxns(pagination?: PaginationOptions): Observable<CashTransaction[]> {
+    return this.http.get<ICashTransaction[]>(`${this.txnUrl}/cash`, {
+      params: {
+        ...pagination
+      }
+    }).pipe(
       map((txns: ICashTransaction[]) => {
         for (const txn of txns) {
           txn.timestamp = new Date(txn.timestamp);
@@ -49,8 +54,12 @@ export class TransactionsService {
     );
   }
 
-  getBeverageTxns(limit?: number): Observable<BeverageTransaction[]> {
-    return this.http.get<IBeverageTransaction[]>(`${this.txnUrl}/beverages${limit ? `?limit=${limit}` : ''}`).pipe(
+  getBeverageTxns(pagination?: PaginationOptions): Observable<BeverageTransaction[]> {
+    return this.http.get<IBeverageTransaction[]>(`${this.txnUrl}/beverages`, {
+      params: {
+        ...pagination
+      }
+    }).pipe(
       map((txns: IBeverageTransaction[]) => {
         for (const txn of txns) {
           txn.timestamp = new Date(txn.timestamp);

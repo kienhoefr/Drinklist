@@ -111,7 +111,7 @@ export class UserListPageComponent implements OnInit {
       }
     });
     if (this.tickerEnabled) {
-      this.txnService.getBeverageTxns(3).subscribe({
+      this.txnService.getBeverageTxns({limit: 3}).subscribe({
         next: txns => {
           this.tickerItems = txns;
         }
