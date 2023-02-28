@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/kienhoefr/Drinklist/compare/v2.0.3...v2.1.0) (2023-02-28)
+
+
+### Features
+
+* add option to get counts of multiple transaction types ([628af37](https://github.com/kienhoefr/Drinklist/commit/628af371afa56cabef8cdb9bf1bcaf1362720a79))
+* **angular:** add pagination features to transaction lists ([eb67143](https://github.com/kienhoefr/Drinklist/commit/eb67143b87e067a524917c43692db484d0447cfb)), closes [#7](https://github.com/kienhoefr/Drinklist/issues/7)
+
+
+### Bug Fixes
+
+* **angular:** more API implementation fixes ([9ce493d](https://github.com/kienhoefr/Drinklist/commit/9ce493d427c566272901e2d4c0cb46d48743dea9))
+* **express:** send a response on transaction rollback ([c7bd743](https://github.com/kienhoefr/Drinklist/commit/c7bd7438754b61cf693d6d1211da8a311aac7b9c))
+* **sql:** stock now decreases when ordering a beverage ([44f9064](https://github.com/kienhoefr/Drinklist/commit/44f90642df5f76b3b5dd1f6229f05ecb0e23056f))
+
 ### [2.0.3](https://github.com/kienhoefr/Drinklist/compare/v2.0.2...v2.0.3) (2023-01-25)
 
 
