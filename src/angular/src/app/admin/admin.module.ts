@@ -9,7 +9,7 @@ import {AdminStatBeverageToplistComponent} from './admin-dashboard/admin-stat-be
 import {AdminStatUserToplistComponent} from './admin-dashboard/admin-stat-user-toplist.component';
 import {AdminRoutingModule} from './admin-routing.module';
 import {AdminBeveragesComponent} from './admin-beverages/admin-beverages.component';
-import {NgbCollapseModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbCollapseModule, NgbPagination} from '@ng-bootstrap/ng-bootstrap';
 import {AdminBeveragesTableComponent} from './admin-beverages/admin-beverages-table.component';
 import {AdminBeveragesTableEntryComponent} from './admin-beverages/admin-beverages-table-entry.component';
 import {AdminBeveragesActionsComponent} from './admin-beverages/admin-beverages-actions.component';
@@ -62,14 +62,15 @@ import {AdminBeverageTransactionTableEntryComponent} from './admin-beverage-tran
     AdminSessionsTableEntryComponent,
     AdminSettingsComponent,
   ],
-  imports: [
-    CommonModule,
-    AdminRoutingModule,
-    FontAwesomeModule,
-    NgbCollapseModule,
-    AdminModalsModule,
-    FormsModule,
-  ]
+    imports: [
+        CommonModule,
+        AdminRoutingModule,
+        FontAwesomeModule,
+        NgbCollapseModule,
+        AdminModalsModule,
+        FormsModule,
+        NgbPagination,
+    ]
 })
 export class AdminModule {
 }
