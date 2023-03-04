@@ -1,18 +1,14 @@
 import {IBeverageTransaction} from './i-beverage-transaction';
-import {Observable, ReplaySubject} from 'rxjs';
+import {catchError, Observable, of, shareReplay} from 'rxjs';
 import {User} from './user';
 import {Beverage} from './beverage';
-import {UserService} from '../services/user.service';
-import {BeverageService} from '../services/beverage.service';
-import {retry} from 'rxjs/operators';
+import {IGetUserById} from '../services/user.service';
+import {IGetBeverageById} from '../services/beverage.service';
 
 export class BeverageTransaction implements IBeverageTransaction {
 
-  private readonly userSubject = new ReplaySubject<User>(1);
-  readonly user$: Observable<User> = this.userSubject.asObservable();
-
-  private readonly beverageSubject = new ReplaySubject<Beverage>(1);
-  readonly beverage$: Observable<Beverage> = this.beverageSubject.asObservable();
+  readonly user$: Observable<User>;
+  readonly beverage$: Observable<Beverage>;
 
   constructor(
     public beverage: number,
@@ -21,37 +17,29 @@ export class BeverageTransaction implements IBeverageTransaction {
     public timestamp: Date,
     public units: number,
     public user: number,
-    userService: UserService,
-    beverageService: BeverageService,
+    user$: Observable<User>,
+    beverage$: Observable<Beverage>,
     public cashTxn?: number,
   ) {
-    userService.getUserById(user).pipe(
-      retry(3), // retry up to three times on error
-    ).subscribe({
-      next: user => {
-        this.userSubject.next(user);
-      },
-      error: err => {
+    this.user$ = user$.pipe(
+      catchError((err) => {
         console.error(err);
-        this.userSubject.next({id: -1, name: '[Unkown User]', balance: 0, hidden: 0, deleted: 0});
-      }
-    });
-    beverageService.getBeverageById(beverage).pipe(
-      retry(3), // retry up to three times on error
-    ).subscribe({
-      next: beverage => {
-        this.beverageSubject.next(beverage);
-      },
-      error: err => {
+        return of({id: -1, name: '[Unkown User]', balance: 0, hidden: 0, deleted: 0} as User);
+      }),
+      shareReplay(1)
+    );
+    this.beverage$ = beverage$.pipe(
+      catchError((err) => {
         console.error(err);
-        this.beverageSubject.next({id: -1, name: '[Unknown Beverage]', stock: 0, price: 0});
-      }
-    });
+        return of({id: -1, name: '[Unknown Beverage]', stock: 0, price: 0} as Beverage);
+      }),
+      shareReplay(1)
+    );
   }
 
-  static fromInterface(txn: IBeverageTransaction, userService: UserService, beverageService: BeverageService): BeverageTransaction {
+  static fromInterface(txn: IBeverageTransaction, userService: IGetUserById, beverageService: IGetBeverageById): BeverageTransaction {
     return new BeverageTransaction(txn.beverage, txn.id, txn.money, txn.timestamp, txn.units, txn.user,
-      userService, beverageService, txn.cashTxn);
+      userService.getUserById(txn.user), beverageService.getBeverageById(txn.beverage), txn.cashTxn);
   }
 
   isFresh(): boolean {

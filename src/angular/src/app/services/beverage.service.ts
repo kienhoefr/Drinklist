@@ -5,10 +5,14 @@ import {noop, Observable} from 'rxjs';
 import {Beverage} from '../models/beverage';
 import {environment} from '../../environments/environment';
 
+export interface IGetBeverageById {
+  getBeverageById(id: number): Observable<Beverage>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class BeverageService {
+export class BeverageService implements IGetBeverageById {
 
   private readonly api = environment.apiRoot;
   private readonly beveragesUrl = `${this.api}/beverages`;

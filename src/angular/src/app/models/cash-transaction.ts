@@ -1,55 +1,44 @@
 import {ICashTransaction} from './i-cash-transaction';
-import {Observable, ReplaySubject} from 'rxjs';
+import {catchError, Observable, of, shareReplay} from 'rxjs';
 import {User} from './user';
-import {UserService} from '../services/user.service';
-import {retry} from 'rxjs/operators';
+import {IGetUserById} from '../services/user.service';
 
 export class CashTransaction implements ICashTransaction {
 
-  private readonly userFromSubject = new ReplaySubject<User>(1);
-  readonly userFrom$: Observable<User> = this.userFromSubject.asObservable();
-
-  private readonly userToSubject = new ReplaySubject<User>(1);
-  readonly userTo$: Observable<User> = this.userToSubject.asObservable();
+  readonly userFrom$: Observable<User>;
+  readonly userTo$: Observable<User>;
 
   constructor(
-    public amount: number,
-    public id: number,
-    public reason: string,
-    public reverted: boolean,
-    public timestamp: Date,
-    public userFrom: number,
-    public userTo: number,
-    userService: UserService,
-    public beverageTxn?: number,
+    public readonly amount: number,
+    public readonly id: number,
+    public readonly reason: string,
+    public readonly reverted: boolean,
+    public readonly timestamp: Date,
+    public readonly userFrom: number,
+    public readonly userTo: number,
+    userFrom$: Observable<User>,
+    userTo$: Observable<User>,
+    public readonly beverageTxn?: number,
   ) {
-    userService.getUserById(userFrom).pipe(
-      retry(3), // retry up to three times on error
-    ).subscribe({
-      next: user => {
-        this.userFromSubject.next(user);
-      },
-      error: err => {
+    this.userFrom$ = userFrom$.pipe(
+      catchError((err) => {
         console.error(err);
-        this.userFromSubject.next({id: -1, name: '[Unkown User]', balance: 0, hidden: 0, deleted: 0});
-      }
-    });
-    userService.getUserById(userTo).pipe(
-      retry(3), // retry up to three times on error
-    ).subscribe({
-      next: user => {
-        this.userToSubject.next(user);
-      },
-      error: err => {
+        return of({id: -1, name: '[Unkown User]', balance: 0, hidden: 0, deleted: 0} as User);
+      }),
+      shareReplay(1)
+    );
+    this.userTo$ = userTo$.pipe(
+      catchError((err) => {
         console.error(err);
-        this.userToSubject.next({id: -1, name: '[Unkown User]', balance: 0, hidden: 0, deleted: 0});
-      }
-    });
+        return of({id: -1, name: '[Unkown User]', balance: 0, hidden: 0, deleted: 0} as User);
+      }),
+      shareReplay(1)
+    );
   }
 
-  static fromInterface(txn: ICashTransaction, userService: UserService): CashTransaction {
+  static fromInterface(txn: ICashTransaction, service: IGetUserById): CashTransaction {
     return new CashTransaction(txn.amount, txn.id, txn.reason, txn.reverted, txn.timestamp, txn.userFrom, txn.userTo,
-      userService, txn.beverageTxn);
+      service.getUserById(txn.userFrom), service.getUserById(txn.userTo), txn.beverageTxn);
   }
 
   isFresh(): boolean {

@@ -6,10 +6,14 @@ import {map} from 'rxjs/operators';
 import {environment} from '../../environments/environment';
 
 
+export interface IGetUserById {
+  getUserById(id: number): Observable<User>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-export class UserService {
+export class UserService implements IGetUserById {
 
   private readonly api = environment.apiRoot;
   private readonly usersUrl = `${this.api}/users`;
@@ -23,6 +27,10 @@ export class UserService {
     return this.http.get<User[]>(this.usersUrl);
   }
 
+  /**
+   * @deprecated
+   * @param id
+   */
   getUser(id: number): Observable<User> {
     return this.http.get<User>(`${this.usersUrl}/${id}`);
   }
