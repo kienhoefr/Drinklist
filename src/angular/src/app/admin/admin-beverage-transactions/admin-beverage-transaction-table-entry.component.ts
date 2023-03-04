@@ -7,8 +7,8 @@ import {BeverageTransaction} from '../../models/beverage-transaction';
   selector: '[app-admin-beverage-transaction-table-entry]',
   template: `
     <td class="text-end pe-3">{{transaction.id}}</td>
-    <td>{{(transaction.user$ | async)?.name}}</td>
-    <td>{{(transaction.beverage$ | async)?.name}}</td>
+    <td>{{(transaction.user$ | async)?.name ?? 'Loading...'}}</td>
+    <td>{{(transaction.beverage$ | async)?.name ?? 'Loading...'}}</td>
     <td class="text-end pe-3" [class.text-danger]="transaction.money < 0"
         [class.text-success]="transaction.money > 0">{{moneyFormat(transaction.money)}}</td>
     <td class="text-end pe-3">{{transaction.units}}</td>

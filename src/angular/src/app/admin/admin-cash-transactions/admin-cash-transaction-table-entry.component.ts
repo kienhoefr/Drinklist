@@ -7,8 +7,8 @@ import {CashTransaction} from '../../models/cash-transaction';
   selector: '[app-admin-cash-transaction-table-entry]',
   template: `
     <td class="text-end pe-3">{{transaction.id}}</td>
-    <td>{{(transaction.userFrom$ | async)?.name}}</td>
-    <td>{{(transaction.userTo$ | async)?.name}}</td>
+    <td>{{(transaction.userFrom$ | async)?.name ?? 'Loading...'}}</td>
+    <td>{{(transaction.userTo$ | async)?.name ?? 'Loading...'}}</td>
     <td>{{transaction.reason}}</td>
     <td class="text-end pe-3" [class.text-danger]="transaction.amount < 0"
         [class.text-success]="transaction.amount > 0">{{moneyFormat(transaction.amount)}}</td>

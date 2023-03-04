@@ -12,6 +12,7 @@ import {CashTransaction} from '../models/cash-transaction';
 import {User} from '../models/user';
 import {Beverage} from '../models/beverage';
 import {PaginationOptions} from '../models/pagination-options';
+import {BeverageMemoryCache, UserMemoryCache} from './memory-cache';
 
 @Injectable({
   providedIn: 'root'
@@ -34,10 +35,11 @@ export class TransactionsService {
       }
     }).pipe(
       map((txns: ICashTransaction[]) => {
+        const cache = new UserMemoryCache(this.userService);
         for (const txn of txns) {
           txn.timestamp = new Date(txn.timestamp);
         }
-        return txns.map(txn => CashTransaction.fromInterface(txn, this.userService));
+        return txns.map(txn => CashTransaction.fromInterface(txn, cache));
       })
     );
   }
@@ -61,10 +63,12 @@ export class TransactionsService {
       }
     }).pipe(
       map((txns: IBeverageTransaction[]) => {
+        const userCache = new UserMemoryCache(this.userService);
+        const beverageCache = new BeverageMemoryCache(this.beverageService);
         for (const txn of txns) {
           txn.timestamp = new Date(txn.timestamp);
         }
-        return txns.map(txn => BeverageTransaction.fromInterface(txn, this.userService, this.beverageService));
+        return txns.map(txn => BeverageTransaction.fromInterface(txn, userCache, beverageCache));
       }),
     );
   }
