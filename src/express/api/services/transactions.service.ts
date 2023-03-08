@@ -12,14 +12,14 @@ export class TransactionsService {
   ) {
   }
 
-  async getTransactions(offset: number, limit: number, txnType: TxnType): Promise<CashTransaction[]> {
+  async getTransactions(offset: number, limit: number, reversed: boolean, txnType: TxnType): Promise<CashTransaction[]> {
     let sql;
     switch (txnType) {
       case 'cash':
-        sql = await this.dbService.prepare('SELECT * FROM cash_transactions WHERE ROWID > ? LIMIT ?');
+        sql = await this.dbService.prepare(`SELECT * FROM cash_transactions WHERE ROWID > ? ORDER BY id ${reversed ? 'DESC' : 'ASC'} LIMIT ?`);
         break;
       case 'beverages':
-        sql = await this.dbService.prepare('SELECT * FROM beverage_transactions WHERE ROWID > ? LIMIT ?');
+        sql = await this.dbService.prepare(`SELECT * FROM beverage_transactions WHERE ROWID > ? ORDER BY id ${reversed ? 'DESC' : 'ASC'} LIMIT ?`);
         break;
     }
     return sql.all(offset, limit);
