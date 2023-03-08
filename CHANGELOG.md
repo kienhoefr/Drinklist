@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/kienhoefr/Drinklist/compare/v2.1.1...v2.2.0) (2023-03-08)
+
+
+### Features
+
+* **angular:** change transaction list display to last-first ([81242a4](https://github.com/kienhoefr/Drinklist/commit/81242a418612ef8d37df971c34831653c9301382)), closes [#9](https://github.com/kienhoefr/Drinklist/issues/9)
+* **express:** allow transaction lists to be reversed ([9e19262](https://github.com/kienhoefr/Drinklist/commit/9e19262704d6ec608035bd0e98abaf8980f34c4b)), closes [#9](https://github.com/kienhoefr/Drinklist/issues/9)
+
+
+### Bug Fixes
+
+* **angular:** only send one request for a single user ([b31fff0](https://github.com/kienhoefr/Drinklist/commit/b31fff0039db45f50ce0c6c9ff1a51e67db0de23)), closes [#8](https://github.com/kienhoefr/Drinklist/issues/8)
+
 ### [2.1.1](https://github.com/kienhoefr/Drinklist/compare/v2.1.0...v2.1.1) (2023-02-28)
 
 
