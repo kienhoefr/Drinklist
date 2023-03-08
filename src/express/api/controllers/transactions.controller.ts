@@ -33,6 +33,7 @@ export class TransactionsController extends BaseController {
     }
     let offset = +(req.query.offset || 0); // used for pagination
     let limit = +(req.query.limit || 100);
+    let reversed = req.query.reversed !== undefined;
 
     if (req.header('x-auth-state') !== 'admin') {
       // Restrict users' ability to retrieve transactions
@@ -41,7 +42,7 @@ export class TransactionsController extends BaseController {
       limit = limit < 10 ? limit : 10;
     }
 
-    const transactions = await this.txnService.getTransactions(offset, limit, txnType);
+    const transactions = await this.txnService.getTransactions(offset, limit, reversed, txnType);
     res.status(200).json(transactions);
   }
 
