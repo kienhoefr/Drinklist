@@ -47,7 +47,7 @@ export class AdminBeverageTransactionComponent implements OnInit {
 
   loadOrders(): void {
     combineLatest({
-      txns: this.txnService.getBeverageTxns({limit: 15, offset: (this.page - 1) * 15}),
+      txns: this.txnService.getBeverageTxns({limit: 15, offset: (this.page - 1) * 15}, true),
       count: this.txnService.getBeverageTransactionCount(),
     }).subscribe({
       next: (({txns, count}) => {

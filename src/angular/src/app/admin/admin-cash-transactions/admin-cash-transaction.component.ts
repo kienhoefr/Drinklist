@@ -48,7 +48,7 @@ export class AdminCashTransactionComponent implements OnInit {
 
   loadTransactions(): void {
     combineLatest({
-      txns: this.txnService.getCashTxns({limit: 15, offset: (this.page - 1) * 15}),
+      txns: this.txnService.getCashTxns({limit: 15, offset: (this.page - 1) * 15}, true),
       count: this.txnService.getCashTransactionCount(),
     }).subscribe({
       next: (({txns, count}) => {

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {noop, Observable} from 'rxjs';
 import {ICashTransaction} from '../models/i-cash-transaction';
 import {map} from 'rxjs/operators';
@@ -28,12 +28,18 @@ export class TransactionsService {
   ) {
   }
 
-  getCashTxns(pagination?: PaginationOptions): Observable<CashTransaction[]> {
-    return this.http.get<ICashTransaction[]>(`${this.txnUrl}/cash`, {
-      params: {
+  getCashTxns(pagination?: PaginationOptions, reversed: boolean = false): Observable<CashTransaction[]> {
+    let params = new HttpParams({
+      fromObject: {
         ...pagination
       }
-    }).pipe(
+    });
+
+    if (reversed) {
+      params = params.set('reversed', 1);
+    }
+
+    return this.http.get<ICashTransaction[]>(`${this.txnUrl}/cash`, {params}).pipe(
       map((txns: ICashTransaction[]) => {
         const cache = new UserMemoryCache(this.userService);
         for (const txn of txns) {
@@ -56,12 +62,18 @@ export class TransactionsService {
     );
   }
 
-  getBeverageTxns(pagination?: PaginationOptions): Observable<BeverageTransaction[]> {
-    return this.http.get<IBeverageTransaction[]>(`${this.txnUrl}/beverages`, {
-      params: {
+  getBeverageTxns(pagination?: PaginationOptions, reversed: boolean = false): Observable<BeverageTransaction[]> {
+    let params = new HttpParams({
+      fromObject: {
         ...pagination
       }
-    }).pipe(
+    });
+
+    if (reversed) {
+      params = params.set('reversed', 1);
+    }
+
+    return this.http.get<IBeverageTransaction[]>(`${this.txnUrl}/beverages`, {params}).pipe(
       map((txns: IBeverageTransaction[]) => {
         const userCache = new UserMemoryCache(this.userService);
         const beverageCache = new BeverageMemoryCache(this.beverageService);
