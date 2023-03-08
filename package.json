@@ -1,6 +1,6 @@
 {
   "name": "drinklist",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Web app for ordering various drinks",
   "main": "dist/express/main.js",
   "scripts": {
