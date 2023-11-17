@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.3
 
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 RUN apk add --no-cache sqlite tzdata
 
