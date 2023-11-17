@@ -32,10 +32,18 @@ export class AuthController implements IController {
       res.status(400).end();
       return;
     }
+
+    const ip = req.ip;
+
+    if (!ip) {
+      res.status(500).send();
+      return;
+    }
+
     const session = new Session(
       req.header('user-agent') || 'User-Agent not specified',
       req.header('referrer') || 'Referrer not specified',
-      req.ip
+      ip
     );
     if (this.auth.login(password, session)) {
       res.status(200).send(session.token);
@@ -66,5 +74,5 @@ export class AuthController implements IController {
 
     this.auth.revoke(token);
     res.status(200).end();
-  }
+  };
 }
