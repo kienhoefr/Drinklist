@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.2.1](https://github.com/kienhoefr/Drinklist/compare/v2.2.0...v2.2.1) (2023-11-17)
+
+
+### Bug Fixes
+
+* handle undefined remote IP ([a0d57d5](https://github.com/kienhoefr/Drinklist/commit/a0d57d5efa3e57457abb4a409f736a5c3ecab30d))
+
 ## [2.2.0](https://github.com/kienhoefr/Drinklist/compare/v2.1.1...v2.2.0) (2023-03-08)
 
 
