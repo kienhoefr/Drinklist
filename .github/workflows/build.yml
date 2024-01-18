@@ -39,7 +39,7 @@ jobs:
         run: npm -g install npm
 
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .npm
           key: npm-${{ hashFiles('package-lock.json') }}
@@ -71,7 +71,7 @@ jobs:
         run: npm -g install npm
 
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .npm
           key: npm-${{ hashFiles('package-lock.json') }}
